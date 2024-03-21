@@ -1,0 +1,35 @@
+---
+- name: Give SSH access to a user
+  hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: false
+
+  vars_prompt:
+    - name: username
+      prompt: "Enter the username:"
+      private: no
+
+    - name: access_type
+      prompt: "Enter the type of access (sudo, readonly, etc.):"
+      private: no
+
+    - name: group_name
+      prompt: "Enter the existing group to grant access to:"
+      private: no
+
+  tasks:
+    - name: Add user to group
+      user:
+        name: "{{ username }}"
+        groups: "{{ group_name }}"
+        append: yes
+
+    - name: Set access type
+      command: "{{ 'usermod -aG sudo' if access_type == 'sudo' else 'usermod -aG readonly' }} {{ username }}"
+      when: access_type == 'sudo' or access_type == 'readonly'
+
+    - name: Restart SSH service
+      service:
+        name: ssh
+        state: restarted
