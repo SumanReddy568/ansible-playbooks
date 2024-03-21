@@ -1,0 +1,28 @@
+---
+- name: Install User-Defined Package or Service on Ubuntu
+  hosts: all
+  become: yes
+  gather_facts: true
+
+  vars_prompt:
+    - name: package_name
+      prompt: "Enter the name of the package or service to install on Ubuntu:"
+      private: no
+
+  tasks:
+    - name: Check if the package or service is installed
+      command: "dpkg-query -l {{ package_name }}"
+      register: package_status
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install the package if not present
+      apt:
+        name: "{{ package_name }}"
+        state: present
+      when: ansible_os_family == 'Debian' and package_status.rc != 0
+
+    - name: Display a message if the package is already installed
+      debug:
+        msg: "{{ package_name }} is already installed."
+      when: package_status.rc == 0
