@@ -1,0 +1,17 @@
+---
+- name: Gather RAM information from all hosts
+  hosts: all
+  become: true
+  tasks:
+    - name: Get RAM information
+      ansible.builtin.shell: free -m | awk 'NR==2{printf "%.2f\n", $3*100/$2 }'
+      register: ram_usage
+
+    - name: Display RAM information
+      ansible.builtin.debug:
+        msg: "RAM Usage: {{ ram_usage.stdout }}%"
+
+    - name: Check if RAM usage exceeds 90%
+      ansible.builtin.fail:
+        msg: "Memory consumption is above 90%!"
+      when: ram_usage.stdout | float > 90

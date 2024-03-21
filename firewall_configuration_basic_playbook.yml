@@ -1,0 +1,68 @@
+---
+- name: Configure firewall
+  hosts: all
+  become: yes
+  tasks:
+    - name: Allow SSH connections
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: 22
+        jump: ACCEPT
+      become: yes
+
+    - name: Allow HTTP and HTTPS connections
+      iptables:
+        chain: INPUT
+        state: present
+        protocol: tcp
+        destination_port: "{{ item }}"
+        jump: ACCEPT
+      become: yes
+      loop:
+        - 80
+        - 443
+
+    - name: Allow ICMP (Ping) requests
+      iptables:
+        chain: INPUT
+        state: present
+        protocol: icmp
+        jump: ACCEPT
+      become: yes
+
+    - name: Allow DNS requests (UDP)
+      iptables:
+        chain: INPUT
+        state: present
+        protocol: udp
+        destination_port: 53
+        jump: ACCEPT
+      become: yes
+
+    - name: Allow NTP requests (UDP)
+      iptables:
+        chain: INPUT
+        state: present
+        protocol: udp
+        destination_port: 123
+        jump: ACCEPT
+      become: yes
+
+    - name: Allow established and related connections
+      iptables:
+        chain: INPUT
+        state: present
+        ctstate: "{{ item }}"
+        jump: ACCEPT
+      become: yes
+      loop:
+        - ESTABLISHED
+        - RELATED
+
+    - name: Drop all other incoming connections
+      iptables:
+        chain: INPUT
+        state: present
+        jump: DROP
+      become: yes

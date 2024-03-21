@@ -1,0 +1,54 @@
+
+**************************** A N S I B L E ************************************
+
+Ansible is an open-source automation tool that helps with configuration management, application deployment, task automation, and orchestration. It is designed to be simple, agentless, and extensible, making it popular among system administrators, DevOps teams, and IT professionals for managing infrastructure and ensuring consistency across servers.
+
+
+Inventory:
+
+Ansible uses an inventory file to define the hosts it will manage.
+Hosts can be grouped, and variables can be associated with them.
+Inventory can be static or dynamic.
+
+Playbooks:
+
+Playbooks are YAML files that define a set of tasks to be executed on hosts.
+Tasks are units of work, and playbooks provide a structure for organizing and executing them.
+
+Tasks:
+
+Tasks are individual actions that Ansible performs, such as installing packages, copying files, or restarting services.
+
+Modules:
+
+Ansible uses modules to perform specific tasks on managed hosts.
+Modules can be simple commands (like shell or copy) or complex (like managing packages or users).
+Handlers:
+
+Handlers are tasks triggered by other tasks.
+For example, restarting a service only if a configuration file has changed.
+
+Roles:
+
+Roles provide a way to organize playbooks and share common configurations.
+A role can include tasks, variables, and handlers.
+https://www.useblackbox.io/editor?id=5dc38640-4694-43d2-957d-dc4db52896a4
+fariables:
+
+Variables allow you to parameterize playbooks and make them more flexible.
+Variables can be defined at different levels, including inventory, playbooks, and roles.
+
+Templates:
+
+Templates allow you to use Jinja2 syntax to create dynamic configuration files.
+Ansible replaces variables in templates with actual values during execution.
+
+Conditionals and Loops:
+
+Ansible playbooks support conditional statements and loops to handle different scenarios.
+Facts:
+
+Ansible gathers information about managed hosts, such as operating system details, network interfaces, and hardware information.
+
+
+* ansible-doc -l : This command will provide a list of all available modules, including both built-in modules and those provided by installed collections

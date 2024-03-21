@@ -1,0 +1,68 @@
+---
+- name: Configure firewall dynamically
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: port_number
+      prompt: "Enter port number"
+      private: no
+    - name: action
+      prompt: "Allow (A) or Block (B) port?"
+      private: no
+  tasks:
+    - name: Allow or block port based on user input
+      iptables:
+        chain: INPUT
+        state: "{{ 'present' if action|lower == 'a' else 'absent' }}"
+        protocol: tcp
+        destination_port: "{{ port_number }}"
+        jump: "{{ 'ACCEPT' if action|lower == 'a' else 'DROP' }}"
+      become: yes
+      
+# - name: Configure firewall dynamically
+#   hosts: all
+#   become: yes
+#   vars_prompt:
+#     - name: port_number
+#       prompt: "Enter port number"
+#       private: no
+#     - name: action
+#       prompt: "Allow (A) or Block (B) port?"
+#       private: no
+#   tasks:
+#     - name: Check if port is already open (without -p flag)
+#       shell: iptables -L INPUT --dport {{ port_number }} | grep ACCEPT
+#       register: port_open_check
+#       ignore_errors: yes
+
+#     - name: Check if port is already blocked (without -p flag)
+#       shell: iptables -L INPUT --dport {{ port_number }} | grep DROP
+#       register: port_block_check
+#       ignore_errors: yes
+
+#     - block:
+#         - name: Port already open on allow action
+#           fail:
+#             msg: "Port {{ port_number }} is already open. Cannot allow again."
+#           when: port_open_check.rc == 0 and action|lower == 'a'
+
+#         - name: Port already blocked on block action
+#           fail:
+#             msg: "Port {{ port_number }} is already blocked. Cannot block again."
+#           when: port_block_check.rc == 0 and action|lower == 'b'
+#       when: port_open_check.rc == 0 or port_block_check.rc == 0
+
+#     - name: Allow or block port based on user input
+#       iptables:
+#         chain: INPUT
+#         state: "{{ 'PRESENT' if action|lower == 'a' else 'ABSENT' }}"
+#         protocol: tcp  # Assuming TCP, adjust for other protocols if needed
+#         destination_port: "{{ port_number }}"
+#         jump: "{{ 'ACCEPT' if action|lower == 'a' else 'DROP' }}"
+#       become: yes
+
+#     - name: Log successful rule change (optional)
+#       debug:
+#         msg: "Successfully {{ action|upper }}ed port {{ port_number }} on INPUT chain."
+#       when: not port_open_check.rc or not port_block_check.rc
+# #

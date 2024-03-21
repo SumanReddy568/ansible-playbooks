@@ -1,0 +1,38 @@
+---
+- name: Remove and reinstall Nginx
+  hosts: all
+  become: true
+  tasks:
+    - name: Remove Nginx and its configuration files
+      apt:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - nginx
+        - nginx-common
+        - nginx-core
+      ignore_errors: yes
+
+    - name: Remove residual configuration files
+      apt:
+        autoclean: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable Nginx to start on boot
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Verify Nginx status
+      systemd:
+        name: nginx
+        state: restarted

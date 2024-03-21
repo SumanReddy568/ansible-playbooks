@@ -1,0 +1,51 @@
+---
+- name: Allow or Block SSH connections dynamically
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: action
+      prompt: "Allow (A) or Block (B) SSH connections?"
+      private: no
+  tasks:
+    - name: Check if SSH service is running
+      service_facts:
+      register: services
+      ignore_errors: yes
+
+    - name: Ensure SSH service is running
+      service:
+        name: sshd
+        state: started
+      when: services.services is defined and 'sshd' in services.services
+
+    - name: Check if port 22 is allowed in firewall
+      shell: iptables -C INPUT -p tcp --dport 22 -j ACCEPT
+      register: port_allowed_check
+      ignore_errors: yes
+
+    - name: Check if port 22 is blocked in firewall
+      shell: iptables -C INPUT -p tcp --dport 22 -j DROP
+      register: port_blocked_check
+      ignore_errors: yes
+
+    - name: Handle existing firewall rules
+      block:
+        - name: Throw error if port is already allowed
+          fail:
+            msg: "SSH port 22 is already allowed."
+          when: action|lower == 'a' and port_allowed_check.rc == 0
+
+        - name: Throw error if port is already blocked
+          fail:
+            msg: "SSH port 22 is already blocked."
+          when: action|lower == 'b' and port_blocked_check.rc == 0
+      when: port_allowed_check.rc == 0 or port_blocked_check.rc == 0
+
+    - name: Allow or block SSH connections based on user input
+      iptables:
+        chain: INPUT
+        state: "{{ 'present' if action|lower == 'a' else 'absent' }}"
+        protocol: tcp
+        destination_port: 22
+        jump: "{{ 'ACCEPT' if action|lower == 'a' else 'DROP' }}"
+      become: yes
