@@ -1,0 +1,22 @@
+---
+- name: Docker Hub Login and Verification
+  hosts: all
+  become: yes
+  vars:
+    docker_hub_username: ""
+    docker_hub_access_token: ""
+  tasks:
+    - name: Ensure Docker Hub login
+      docker_login:
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_access_token }}"
+        registry_url: "https://index.docker.io/v1/"
+
+    - name: Check Docker login status
+      shell: docker info
+      register: docker_info_output
+      ignore_errors: yes
+
+    - name: Print Docker login status
+      debug:
+        msg: "Docker login status: {{ 'successful' if docker_info_output.rc == 0 else 'unsuccessful' }}"
