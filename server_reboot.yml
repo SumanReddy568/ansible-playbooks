@@ -1,0 +1,9 @@
+---
+- name: Reboot servers
+  hosts: all
+  become: yes
+  gather_facts: false
+
+  tasks:
+    - name: Reboot server
+      reboot:
