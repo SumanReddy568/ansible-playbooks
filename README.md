@@ -7,14 +7,14 @@ Welcome to the Ansible Playbooks Repository! This repository contains a collecti
 Ansible is an open-source automation tool used for configuration management, application deployment, task automation, and orchestration. It simplifies complex tasks by allowing you to describe infrastructure configurations in simple YAML files, called playbooks, which are easy to read, write, and understand.
 
 ## Contents
-
+```shell
 ### 1. Ad-hoc Commands
 
 Ad-hoc commands are used for performing quick tasks on remote hosts without the need for writing a playbook. These commands are particularly useful for tasks like gathering information, installing packages, restarting services, etc.
 
 Example:
-```shell
-ansible all -i inventory.ini -m command -a "uptime" 
+
+ansible all -i inventory.ini -m command -a "uptime" shell 
 
 ### 2. Playbooks
 
