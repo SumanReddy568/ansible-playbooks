@@ -1,0 +1,16 @@
+---
+- name: Restart specified service
+  hosts: all
+  become: yes
+  gather_facts: false
+
+  vars_prompt:
+    - name: service_name
+      prompt: "Enter the name of the service to restart:"
+      private: no
+
+  tasks:
+    - name: Restart the specified service
+      service:
+        name: "{{ service_name }}"
+        state: restarted
