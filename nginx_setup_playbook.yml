@@ -2,6 +2,9 @@
 - name: Remove and reinstall Nginx
   hosts: all
   become: true
+  vars:
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
   tasks:
     - name: Remove Nginx and its configuration files
       apt:
